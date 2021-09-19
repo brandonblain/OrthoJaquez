@@ -9,24 +9,27 @@ use sisVentas\Categoria;
 use Illuminate\Support\Facades\Redirect;
 use sisVentas\Http\Requests\CategoriaFormRequest;
 use DB;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 
 
 class CategoriaController extends Controller
 {
-    public function __construct()
-    {
-
+    public function __construct(){
+        $this->middleware('auth');
     }
+
     public function index(Request $request)
     {
         if ($request)
         {
+            $user=Auth::user()->name;
             $query=trim($request->get('searchText'));
             $categorias=DB::table('categoria')->where('nombre','LIKE','%'.$query.'%')
             ->where ('condicion','=','1')
             ->orderBy('idcategoria','desc')
             ->paginate(7);
-            return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query]);
+            return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query,"user"=>$user]);
         }
     }
     public function create()
@@ -67,6 +70,10 @@ class CategoriaController extends Controller
         return Redirect::to('almacen/categoria');
     }
 
+    public function Info(){
+        $user=Auth::user()->name;
+        return view('layouts.admin',["user"=>$user]);
+    }
 
 
 
